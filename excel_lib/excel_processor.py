@@ -1,6 +1,10 @@
 import openpyxl
 import logging
 
+# Configuration du logger
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('ExcelProcessor')
+
 class ExcelProcessor:
     def __init__(self, file_path):
         self.file_path = file_path
@@ -14,7 +18,10 @@ class ExcelProcessor:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.workbook:
-            self.workbook.close()
+            try:
+                self.workbook.close()
+            except Exception as e:
+                logger.error(f"Erreur lors de la fermeture du fichier Excel: {e}")
 
     def calculate_totals(self, data_column, result_column):
         """
@@ -27,11 +34,11 @@ class ExcelProcessor:
                 total += value
         self.sheet[f"{result_column}{1}"] = "Total"
         self.sheet[f"{result_column}{2}"] = total
-        logging.info(f"Total des colonnes {data_column} calculé: {total}")
+        logger.info(f"Total des colonnes {data_column} calculé: {total}")
 
     def save(self, output_file):
         """
         Sauvegarde le fichier Excel modifié.
         """
         self.workbook.save(output_file)
-        logging.info(f"Fichier Excel enregistré sous {output_file}")
+        logger.info(f"Fichier Excel enregistré sous {output_file}")
